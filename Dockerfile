@@ -1,18 +1,20 @@
-# 使用官方 Python 輕量版影像
 FROM python:3.9-slim
 
-# 設定工作目錄
+# 強制不產生緩存檔案，並即時輸出 Log
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 WORKDIR /app
 
-# 複製工具清單並安裝
+# 複製並安裝
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製程式碼
-COPY main.py .
+# 複製所有檔案到 /app
+COPY . .
 
-# 暴露 Cloud Run 預設的 8080 埠
+# 暴露埠號
 EXPOSE 8080
 
-# 啟動 API 伺服器
-CMD ["uvicorn", "main.py:app", "--host", "0.0.0.0", "--port", "8080"]
+# 修改啟動指令，明確指定路徑
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
